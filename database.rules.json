@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "questions": {
+      ".read": true,
+      ".write": "auth != null || true",
+      ".indexOn": ["difficulty", "category"]
+    },
+    "gameSettings": {
+      ".read": true,
+      ".write": "auth != null || true"
+    },
+    "gameHistory": {
+      ".read": true,
+      ".write": true,
+      "$gameId": {
+        ".validate": "newData.hasChildren(['levelReached', 'score', 'correctCount'])"
+      }
+    },
+    "statistics": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

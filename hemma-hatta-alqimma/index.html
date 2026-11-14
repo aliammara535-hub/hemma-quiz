@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>همة حتى القمة | لعبة المسابقات الثقافية الكبرى</title>
+  <meta name="description" content="لعبة مسابقات ثقافية عربية مستوحاة من من سيربح المليون، تحدى معلوماتك وارتقِ في 10 مستويات للوصول إلى القمة!">
+  <meta name="theme-color" content="#102A56">
+
+  <!-- Google Fonts: Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 95,85 5,85' fill='%23D4AF37'/><polygon points='50,22 80,80 20,80' fill='%23102A56'/><polygon points='50,38 65,72 35,72' fill='%23F5D76E'/></svg>">
+</head>
+<body>
+  <!-- Ambient background lighting and particle glow effects -->
+  <div class="ambient-background" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Top Utilities Bar: Sound Toggle & Database Status -->
+  <header class="top-nav" role="banner">
+    <div class="nav-container">
+      <div class="system-status">
+        <span id="db-status-badge" class="badge badge-warning" title="حالة الاتصال بقاعدة البيانات">
+          <span class="status-dot"></span>
+          <span id="db-status-text">جاري الاتصال...</span>
+        </span>
+      </div>
+
+      <div class="nav-controls">
+        <button id="btn-sound-toggle" class="icon-button" type="button" aria-label="تبديل المؤثرات الصوتية" title="المؤثرات الصوتية">
+          <svg id="sound-icon-on" class="svg-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="sound-icon-off" class="svg-icon is-hidden" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <button id="btn-instructions" class="icon-button" type="button" aria-label="تعليمات اللعبة" title="تعليمات اللعبة">
+          <svg class="svg-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+
+        <button id="btn-db-admin" class="icon-button" type="button" aria-label="إدارة قاعدة البيانات" title="إدارة قاعدة البيانات">
+          <svg class="svg-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Global Toast / Alert Notifications Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- MAIN APP CONTAINER -->
+  <main id="app-container" class="app-main">
+
+    <!-- ==============================================
+         1. MAIN MENU SCREEN (الشاشة الرئيسية)
+         ============================================== -->
+    <section id="screen-main-menu" class="screen screen-main-menu active" aria-labelledby="main-game-title">
+      <div class="menu-content-card">
+
+        <!-- Custom SVG Logo: Mountain Peaks, Golden Crown, Star & Knowledge Torch -->
+        <div class="logo-wrapper">
+          <svg class="game-logo-svg" viewBox="0 0 320 220" width="300" height="206" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="شعار همة حتى القمة">
+            <defs>
+              <linearGradient id="goldLinear" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFF4B8" />
+                <stop offset="25%" stop-color="#F5D76E" />
+                <stop offset="60%" stop-color="#D4AF37" />
+                <stop offset="100%" stop-color="#997A15" />
+              </linearGradient>
+
+              <linearGradient id="blueMountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#245191" />
+                <stop offset="50%" stop-color="#173F73" />
+                <stop offset="100%" stop-color="#102A56" />
+              </linearGradient>
+
+              <linearGradient id="glowSummitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF" />
+                <stop offset="50%" stop-color="#F5D76E" />
+                <stop offset="100%" stop-color="#D4AF37" />
+              </linearGradient>
+
+              <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+
+            <!-- Outer Laurel Wreath / Emblem ring -->
+            <circle cx="160" cy="110" r="98" fill="none" stroke="url(#goldLinear)" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.6"/>
+            <circle cx="160" cy="110" r="104" fill="none" stroke="url(#goldLinear)" stroke-width="1.2" opacity="0.4"/>
+
+            <!-- Secondary Mountain (Background Peak) -->
+            <polygon points="90,165 140,85 190,165" fill="#133363" stroke="url(#goldLinear)" stroke-width="2" opacity="0.8"/>
+            <polygon points="140,85 160,118 140,165" fill="#0C2040" opacity="0.5"/>
+
+            <!-- Main Mountain (Foreground Peak) -->
+            <polygon points="110,175 160,60 210,175" fill="url(#blueMountainGrad)" stroke="url(#goldLinear)" stroke-width="3"/>
+            <!-- Mountain Shadow Facet -->
+            <polygon points="160,60 160,175 210,175" fill="#0E2347" opacity="0.6"/>
+
+            <!-- Snow & Gold Summit Cap -->
+            <polygon points="160,60 148,88 156,84 160,90 166,83 172,88" fill="url(#glowSummitGrad)" filter="url(#goldGlow)"/>
+
+            <!-- Summit Glowing Star -->
+            <g transform="translate(160, 42)">
+              <polygon points="0,-18 5,-5 18,0 5,5 0,18 -5,5 -18,0 -5,-5" fill="url(#goldLinear)" filter="url(#goldGlow)"/>
+              <circle cx="0" cy="0" r="3.5" fill="#FFFFFF"/>
+            </g>
+
+            <!-- Foundation Platform / Knowledge Base -->
+            <path d="M70 178 L250 178 L235 192 L85 192 Z" fill="url(#goldLinear)"/>
+            <line x1="95" y1="185" x2="225" y2="185" stroke="#102A56" stroke-width="2"/>
+
+            <!-- Side Sparkles -->
+            <polygon points="65,95 68,102 75,105 68,108 65,115 62,108 55,105 62,102" fill="url(#goldLinear)" opacity="0.85"/>
+            <polygon points="255,95 258,102 265,105 258,108 255,115 252,108 245,105 252,102" fill="url(#goldLinear)" opacity="0.85"/>
+          </svg>
+        </div>
+
+        <!-- Title & Subtitle -->
+        <div class="title-group">
+          <h1 id="main-game-title" class="game-main-title">
+            <span class="gold-text-gradient">همة حتى القمة</span>
+          </h1>
+          <div class="title-divider">
+            <span class="divider-line"></span>
+            <span class="divider-diamond">◆</span>
+            <span class="divider-line"></span>
+          </div>
+          <p class="game-tagline">مسابقة التحدي والمعرفة الكبرى — 10 مستويات تفصلك عن القمة!</p>
+        </div>
+
+        <!-- Main Action Buttons -->
+        <div class="menu-actions">
+          <button id="btn-start-game" class="btn btn-primary btn-gold-glow" type="button">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span class="btn-text">بدء اللعبة</span>
+          </button>
+
+          <button id="btn-exit-game" class="btn btn-secondary" type="button">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </span>
+            <span class="btn-text">خروج</span>
+          </button>
+        </div>
+
+        <!-- Quick Game Overview Footer -->
+        <div class="menu-stats-pill">
+          <span>🏆 10 مستويات تصاعدية</span>
+          <span class="pill-dot">•</span>
+          <span>⚡ 4 خيارات لكل سؤال</span>
+          <span class="pill-dot">•</span>
+          <span>🧠 بنك أسئلة شامل</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         2. QUIZ GAMEPLAY SCREEN (شاشة اللعبة)
+         ============================================== -->
+    <section id="screen-game" class="screen screen-game" aria-live="assertive">
+
+      <!-- Game Header (Level indicator, Category, Score) -->
+      <div class="game-top-bar">
+        <div class="game-brand-mini">
+          <span class="mini-logo-gem">◆</span>
+          <span class="mini-title">همة حتى القمة</span>
+        </div>
+
+        <div class="game-level-info">
+          <span class="level-badge" id="level-indicator-text">المستوى 1 من 10</span>
+          <span class="difficulty-badge" id="difficulty-badge">سهل</span>
+        </div>
+
+        <div class="game-meta-group">
+          <span class="category-pill" id="question-category">جغرافيا</span>
+          <div class="score-display">
+            <span class="score-label">النقاط:</span>
+            <span class="score-val" id="current-score">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level Ladder Progression Indicator (10 Levels) -->
+      <nav class="levels-ladder" aria-label="مستويات اللعبة">
+        <ol class="ladder-list" id="ladder-list">
+          <li class="ladder-step" data-level="1"><span class="step-num">1</span></li>
+          <li class="ladder-step" data-level="2"><span class="step-num">2</span></li>
+          <li class="ladder-step" data-level="3"><span class="step-num">3</span></li>
+          <li class="ladder-step" data-level="4"><span class="step-num">4</span></li>
+          <li class="ladder-step" data-level="5"><span class="step-num">5</span></li>
+          <li class="ladder-step" data-level="6"><span class="step-num">6</span></li>
+          <li class="ladder-step" data-level="7"><span class="step-num">7</span></li>
+          <li class="ladder-step" data-level="8"><span class="step-num">8</span></li>
+          <li class="ladder-step" data-level="9"><span class="step-num">9</span></li>
+          <li class="ladder-step summit-step" data-level="10">
+            <span class="step-num">القمة 🏆</span>
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Central Game Arena -->
+      <div class="game-arena">
+
+        <!-- Question Box (Large Horizontal Golden-bordered Card) -->
+        <div class="question-container">
+          <div class="question-card" id="question-card">
+            <div class="question-header">
+              <span class="question-badge" id="question-badge">السؤال الأول</span>
+            </div>
+            <div class="question-body">
+              <p id="question-text" class="question-text">جاري تحميل السؤال...</p>
+            </div>
+            <div class="question-accent-line"></div>
+          </div>
+        </div>
+
+        <!-- 2x2 Answer Grid -->
+        <div class="answers-grid-wrapper">
+          <div class="answers-grid" id="answers-grid" role="group" aria-label="خيارات الإجابة">
+
+            <!-- Answer Box 1 -->
+            <button class="answer-box" data-index="0" type="button" aria-label="الخيار الأول">
+              <span class="option-badge">أ</span>
+              <span class="answer-text" id="answer-text-0">الخيار الأول</span>
+              <span class="feedback-icon" aria-hidden="true"></span>
+            </button>
+
+            <!-- Answer Box 2 -->
+            <button class="answer-box" data-index="1" type="button" aria-label="الخيار الثاني">
+              <span class="option-badge">ب</span>
+              <span class="answer-text" id="answer-text-1">الخيار الثاني</span>
+              <span class="feedback-icon" aria-hidden="true"></span>
+            </button>
+
+            <!-- Answer Box 3 -->
+            <button class="answer-box" data-index="2" type="button" aria-label="الخيار الثالث">
+              <span class="option-badge">ج</span>
+              <span class="answer-text" id="answer-text-2">الخيار الثالث</span>
+              <span class="feedback-icon" aria-hidden="true"></span>
+            </button>
+
+            <!-- Answer Box 4 -->
+            <button class="answer-box" data-index="3" type="button" aria-label="الخيار الرابع">
+              <span class="option-badge">د</span>
+              <span class="answer-text" id="answer-text-3">الخيار الرابع</span>
+              <span class="feedback-icon" aria-hidden="true"></span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- In-game Notification Banner (Feedback Message) -->
+        <div id="game-feedback-banner" class="feedback-banner is-hidden" aria-live="polite">
+          <span class="feedback-icon-lg" id="feedback-icon-lg">✓</span>
+          <span class="feedback-message" id="feedback-message">إجابة صحيحة! أحسنت!</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         3. RESULTS & VICTORY SCREEN (شاشة النتائج)
+         ============================================== -->
+    <section id="screen-results" class="screen screen-results" aria-labelledby="results-title">
+      <div class="results-card">
+
+        <!-- Result Trophy / Icon -->
+        <div class="results-badge-wrapper">
+          <div id="results-emblem" class="results-emblem emblem-win">
+            <svg id="icon-victory-trophy" class="result-svg" viewBox="0 0 100 100" width="84" height="84">
+              <!-- Golden Trophy Icon -->
+              <path d="M25 25 L75 25 L68 55 C65 68 55 75 50 75 C45 75 35 68 32 55 Z" fill="url(#goldLinear)" stroke="#997A15" stroke-width="2"/>
+              <path d="M30 30 C15 30 15 50 32 50" fill="none" stroke="url(#goldLinear)" stroke-width="4" stroke-linecap="round"/>
+              <path d="M70 30 C85 30 85 50 68 50" fill="none" stroke="url(#goldLinear)" stroke-width="4" stroke-linecap="round"/>
+              <rect x="46" y="75" width="8" height="12" fill="url(#goldLinear)"/>
+              <path d="M35 87 L65 87 L60 95 L40 95 Z" fill="url(#goldLinear)"/>
+              <polygon points="50,35 53,42 61,43 55,49 57,57 50,53 43,57 45,49 39,43 47,42" fill="#FFF4B8"/>
+            </svg>
+            <svg id="icon-gameover-flag" class="result-svg is-hidden" viewBox="0 0 100 100" width="84" height="84">
+              <!-- Summit Flag Icon -->
+              <line x1="25" y1="90" x2="25" y2="15" stroke="#D4AF37" stroke-width="4" stroke-linecap="round"/>
+              <polygon points="25,20 80,35 25,50" fill="#E74C3C" stroke="#C0392B" stroke-width="2"/>
+              <circle cx="25" cy="15" r="5" fill="#D4AF37"/>
+              <rect x="15" y="88" width="20" height="6" fill="#D4AF37" rx="3"/>
+            </svg>
+          </div>
+        </div>
+
+        <h2 id="results-title" class="results-title">مبروك! وصلت إلى القمة!</h2>
+        <p id="results-subtitle" class="results-subtitle">لقد أثبتت امتلاكك همة عالية وعِلماً رفيعاً باجتيازك جميع المستويات بنجاح باهر!</p>
+
+        <!-- Performance Summary Grid -->
+        <div class="results-stats-grid">
+
+          <div class="stat-box">
+            <span class="stat-icon">🏔️</span>
+            <span class="stat-label">المستوى المنجز</span>
+            <span class="stat-value gold-text" id="stat-level-reached">المستوى 10 من 10</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-label">مجموع النقاط</span>
+            <span class="stat-value gold-text" id="stat-final-score">10,000</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-icon">✅</span>
+            <span class="stat-label">إجابات صحيحة</span>
+            <span class="stat-value text-success" id="stat-correct-count">10</span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-icon">❌</span>
+            <span class="stat-label">إجابات خاطئة</span>
+            <span class="stat-value text-danger" id="stat-wrong-count">0</span>
+          </div>
+
+        </div>
+
+        <!-- Result Action Buttons -->
+        <div class="results-actions">
+          <button id="btn-restart-game" class="btn btn-primary btn-gold-glow" type="button">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            </span>
+            <span class="btn-text">إعادة اللعب</span>
+          </button>
+
+          <button id="btn-return-home" class="btn btn-secondary" type="button">
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </span>
+            <span class="btn-text">العودة للرئيسية</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================
+       MODALS & DIALOGS
+       ============================================== -->
+
+  <!-- 1. Exit Confirmation Modal -->
+  <div id="modal-exit" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="modal-exit-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-exit-title" class="modal-title">مغادرة اللعبة</h3>
+        <button class="modal-close" data-close-modal="modal-exit" type="button" aria-label="إغلاق">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-icon-badge">🚪</div>
+        <p>هل أنت متأكد من رغبتك في الخروج من لعبة <strong>همة حتى القمة</strong>؟</p>
+        <p class="modal-subtext">إذا لم يتم إغلاق النافذة تلقائياً بسبب قيود الأمان في المتصفح، يمكنك إغلاق علامة التبويب مباشرة.</p>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-confirm-exit" class="btn btn-danger" type="button">نعم، خروج</button>
+        <button class="btn btn-secondary" data-close-modal="modal-exit" type="button">إلغاء والعودة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Instructions / How to Play Modal -->
+  <div id="modal-instructions" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="modal-instructions-title">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-instructions-title" class="modal-title">طريقة لعب "همة حتى القمة"</h3>
+        <button class="modal-close" data-close-modal="modal-instructions" type="button" aria-label="إغلاق">&times;</button>
+      </div>
+      <div class="modal-body instructions-body">
+        <div class="instruction-step">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <h4>رحلة الصعود</h4>
+            <p>تتكون اللعبة من <strong>10 مستويات متتالية</strong>، كل مستوى يقدم سؤالاً ثقافياً واحداً بأربعة خيارات.</p>
+          </div>
+        </div>
+
+        <div class="instruction-step">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <h4>تدرج الصعوبة</h4>
+            <p>المستويات 1–3 (سهلة)، المستويات 4–6 (متوسطة)، المستويات 7–8 (صعبة)، والمستويان 9–10 (قمة التحدي وصعبة جداً).</p>
+          </div>
+        </div>
+
+        <div class="instruction-step">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <h4>الإجابة والتقدم</h4>
+            <p>كل إجابة صحيحة تضيء باللون الأخضر وترفعك للمستوى التالي. الإجابة الخاطئة تنهي المسابقة وتُظهر نتيجتك فوراً.</p>
+          </div>
+        </div>
+
+        <div class="instruction-step">
+          <div class="step-badge">4</div>
+          <div class="step-content">
+            <h4>الوصول إلى القمة</h4>
+            <p>أجب عن جميع الأسئلة العشرة بنجاح لتعتلي القمة وتخلد اسمك بين الفائزين!</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-close-modal="modal-instructions" type="button">فهمت، لنبدأ التحدي!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Database Administration & Question Seeder Modal -->
+  <div id="modal-db-admin" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="modal-db-title">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-db-title" class="modal-title">إدارة قاعدة البيانات Firebase</h3>
+        <button class="modal-close" data-close-modal="modal-db-admin" type="button" aria-label="إغلاق">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="db-status-card">
+          <div class="db-info-row">
+            <span class="db-info-label">حالة الاتصال:</span>
+            <span id="admin-db-status" class="db-info-value">فحص الاتصال...</span>
+          </div>
+          <div class="db-info-row">
+            <span class="db-info-label">عدد الأسئلة في قاعدة البيانات:</span>
+            <span id="admin-questions-count" class="db-info-value">0</span>
+          </div>
+          <div class="db-info-row">
+            <span class="db-info-label">إجمالي الجولات الملعوبة:</span>
+            <span id="admin-games-count" class="db-info-value">0</span>
+          </div>
+        </div>
+
+        <div class="db-seed-section">
+          <h4>رفع حزمة الأسئلة الأولية إلى Firebase</h4>
+          <p class="modal-subtext">
+            إذا قمت بربط بيانات Firebase Realtime Database للتو وكانت قاعدة البيانات فارغة، يمكنك بنقرة واحدة رفع حزمة الأسئلة الشاملة (تغطي 20 تصنيفاً و4 مستويات صعوبة).
+          </p>
+          <div class="seeder-actions">
+            <button id="btn-seed-database" class="btn btn-primary" type="button">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-text">رفع الأسئلة إلى Firebase الآن</span>
+            </button>
+            <button id="btn-refresh-db-stats" class="btn btn-secondary" type="button">
+              <span class="btn-icon">🔄</span>
+              <span class="btn-text">تحديث الإحصائيات</span>
+            </button>
+          </div>
+          <div id="seed-progress-container" class="seed-progress-bar is-hidden">
+            <div id="seed-progress-fill" class="progress-fill" style="width: 0%;"></div>
+            <span id="seed-progress-text" class="progress-text">جاري الرفع...</span>
+          </div>
+        </div>
+
+        <div class="fb-config-form">
+          <h4>إعداد وربط مفاتيح Firebase مباشرة</h4>
+          <p class="modal-subtext">يمكنك لصق كائن التكوين (firebaseConfig) الخاص بمشروعك مباشرة هنا والحفظ فورياً:</p>
+          
+          <div class="form-group">
+            <label class="form-label" for="cfg-json-input">الصق كائن إعدادات Firebase (JSON أو JavaScript):</label>
+            <textarea id="cfg-json-input" class="form-textarea" placeholder='{
+  apiKey: "AIzaSy...",
+  authDomain: "your-app.firebaseapp.com",
+  databaseURL: "https://your-app-default-rtdb.firebaseio.com",
+  projectId: "your-app",
+  storageBucket: "your-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+}'></textarea>
+            <p class="form-hint">يمكنك الحصول على هذه البيانات من Firebase Console > Project Settings > Your apps.</p>
+          </div>
+
+          <div class="form-actions">
+            <button id="btn-save-custom-config" class="btn btn-primary" type="button">
+              <span class="btn-icon">💾</span>
+              <span class="btn-text">حفظ والاتصال الآن</span>
+            </button>
+            <button id="btn-reset-config" class="btn btn-secondary" type="button">
+              <span class="btn-icon">↺</span>
+              <span class="btn-text">استعادة الافتراضي</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="db-config-tip">
+          <p>💡 <strong>ملاحظة:</strong> يمكنك أيضاً فتح الملف <code>js/firebase-config.js</code> ووضع إعدادات مشروعك يدوياً.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="modal-db-admin" type="button">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="global-loader" class="global-loader is-hidden" aria-hidden="true">
+    <div class="loader-spinner">
+      <div class="spinner-gold"></div>
+      <p id="loader-message" class="loader-message">جاري التحميل...</p>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs (Compat v9/v10 for standard CDN usage without bundler) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <!-- Application Scripts (in strict order of dependency) -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/firebase-database.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

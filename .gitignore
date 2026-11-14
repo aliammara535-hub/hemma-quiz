@@ -1,0 +1,14 @@
+# Temporary & Local Server Files
+server.ps1
+*.log
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
