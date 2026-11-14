@@ -77,11 +77,40 @@
    * ربط كافة أزرار وعناصر الواجهة
    */
   function bindEvents() {
-    // 1. زر بدء اللعبة
+    // 1. زر بدء اللعبة الشاملة
     const btnStartGame = document.getElementById('btn-start-game');
     if (btnStartGame) {
-      btnStartGame.addEventListener('click', handleStartGame);
+      btnStartGame.addEventListener('click', () => handleStartGame('ALL'));
     }
+
+    // 1.1 زر اختيار تصنيف محدد
+    const btnOpenCategories = document.getElementById('btn-open-categories');
+    if (btnOpenCategories) {
+      btnOpenCategories.addEventListener('click', () => {
+        ui.sound.playClick();
+        ui.openModal('modal-categories');
+      });
+    }
+
+    // 1.2 بطاقات التصنيفات داخل النافذة
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        ui.sound.playClick();
+        const mode = card.getAttribute('data-mode') || 'ALL';
+        ui.closeModal('modal-categories');
+        handleStartGame(mode);
+      });
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          ui.sound.playClick();
+          const mode = card.getAttribute('data-mode') || 'ALL';
+          ui.closeModal('modal-categories');
+          handleStartGame(mode);
+        }
+      });
+    });
 
     // 2. زر الخروج
     const btnExitGame = document.getElementById('btn-exit-game');
@@ -157,7 +186,7 @@
     if (btnRestartGame) {
       btnRestartGame.addEventListener('click', () => {
         ui.sound.playClick();
-        handleStartGame();
+        handleStartGame(game.gameMode || 'ALL');
       });
     }
 
@@ -196,11 +225,13 @@
   }
 
   /**
-   * معالجة بدء لعبة جديدة
+   * معالجة بدء لعبة جديدة (شاملة أو بحسب تصنيف محدد)
+   * @param {string} modeId مفتاح التصنيف (ALL, SPORTS, HISTORY, ...)
    */
-  async function handleStartGame() {
+  async function handleStartGame(modeId = 'ALL') {
     ui.sound.playClick();
-    ui.showLoader('جاري إعداد جولة القمة واختيار الأسئلة...');
+    const modeInfo = window.QuestionsManager.getModeInfo(modeId);
+    ui.showLoader(`جاري إعداد التحدي في [${modeInfo.name}]...`);
 
     try {
       // إذا كان Firebase متصلاً ولم نجلب الأسئلة بعد، نحدثها
@@ -219,13 +250,17 @@
         activeQuestionsPool = window.QuestionsManager.getMasterBank();
       }
 
-      // بدء دورة اللعبة
-      const firstQuestion = await game.startNewGame(activeQuestionsPool);
+      // بدء دورة اللعبة بالتصنيف المختار
+      const firstQuestion = await game.startNewGame(activeQuestionsPool, modeId);
 
       // عرض السؤال والانتقال لشاشة اللعبة
       ui.hideLoader();
       ui.showScreen('game');
       ui.renderQuestion(firstQuestion);
+
+      if (modeId !== 'ALL') {
+        ui.showToast(`بدأت جولة القمة في مجال: ${modeInfo.name} 🏆`, 'info');
+      }
 
     } catch (error) {
       ui.hideLoader();

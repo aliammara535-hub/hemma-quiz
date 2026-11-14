@@ -210,6 +210,7 @@
       this.levelIndicatorText = document.getElementById('level-indicator-text');
       this.difficultyBadge = document.getElementById('difficulty-badge');
       this.questionCategory = document.getElementById('question-category');
+      this.gameModePill = document.getElementById('game-mode-pill');
       this.currentScore = document.getElementById('current-score');
       this.ladderSteps = document.querySelectorAll('.ladder-step');
 
@@ -337,6 +338,17 @@
       this.levelIndicatorText.textContent = `المستوى ${qData.levelNumber} من ${qData.totalLevels}`;
       this.updateDifficultyBadge(qData.difficulty, qData.difficultyLabel);
       this.questionCategory.textContent = qData.category;
+
+      if (this.gameModePill) {
+        if (qData.modeInfo && qData.modeInfo.id !== 'ALL') {
+          this.gameModePill.classList.remove('is-hidden');
+          this.gameModePill.textContent = `${qData.modeInfo.icon} مجال: ${qData.modeInfo.name}`;
+        } else {
+          this.gameModePill.classList.remove('is-hidden');
+          this.gameModePill.textContent = `🌟 اللعبة الشاملة`;
+        }
+      }
+
       this.currentScore.textContent = qData.currentScore.toLocaleString('ar-EG');
       this.updateLadder(qData.levelNumber);
 

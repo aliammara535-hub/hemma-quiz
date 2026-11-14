@@ -159,13 +159,18 @@
 
         <!-- Main Action Buttons -->
         <div class="menu-actions">
-          <button id="btn-start-game" class="btn btn-primary btn-gold-glow" type="button">
+          <button id="btn-start-game" class="btn btn-primary btn-gold-glow" type="button" title="بدء اللعبة الشاملة بكافة التصنيفات">
             <span class="btn-icon">
               <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
             </span>
-            <span class="btn-text">بدء اللعبة</span>
+            <span class="btn-text">بدء اللعبة الشاملة</span>
+          </button>
+
+          <button id="btn-open-categories" class="btn btn-category-glow" type="button" title="اختر تصنيفاً محدداً (مثل رياضة، تاريخ، إسلامية...)">
+            <span class="btn-icon">🎯</span>
+            <span class="btn-text">اختيار تصنيف محدد</span>
           </button>
 
           <button id="btn-exit-game" class="btn btn-secondary" type="button">
@@ -210,6 +215,7 @@
         </div>
 
         <div class="game-meta-group">
+          <span class="mode-pill" id="game-mode-pill">🌟 اللعبة الشاملة</span>
           <span class="category-pill" id="question-category">جغرافيا</span>
           <div class="score-display">
             <span class="score-label">النقاط:</span>
@@ -533,6 +539,98 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-close-modal="modal-db-admin" type="button">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Category Selection Modal (نافذة اختيار التصنيف) -->
+  <div id="modal-categories" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="modal-categories-title">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-categories-title" class="modal-title">🎯 اختر مجال التحدي</h3>
+        <button class="modal-close" data-close-modal="modal-categories" type="button" aria-label="إغلاق">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtext">
+          اختر المجال الذي تريد خوض التحدي فيه. عند اختيار مجال محدد، ستكون جميع أسئلة المستويات العشرة من هذا المجال حصرياً!
+        </p>
+
+        <div class="categories-grid" id="categories-grid-container">
+          <div class="category-card is-all-mode" data-mode="ALL" role="button" tabindex="0">
+            <span class="category-card-icon">🌟</span>
+            <h4 class="category-card-title">اللعبة الشاملة</h4>
+            <p class="category-card-subtitle">كافة المجالات والتصنيفات مختلطة</p>
+          </div>
+
+          <div class="category-card" data-mode="SPORTS" role="button" tabindex="0">
+            <span class="category-card-icon">⚽</span>
+            <h4 class="category-card-title">رياضة وكرة قدم</h4>
+            <p class="category-card-subtitle">كؤوس العالم، الأندية والرياضات العالمية</p>
+          </div>
+
+          <div class="category-card" data-mode="HISTORY" role="button" tabindex="0">
+            <span class="category-card-icon">📜</span>
+            <h4 class="category-card-title">تاريخ وحضارات</h4>
+            <p class="category-card-subtitle">الحضارات القديمة، المعارك والأحداث الكبرى</p>
+          </div>
+
+          <div class="category-card" data-mode="ISLAMIC" role="button" tabindex="0">
+            <span class="category-card-icon">🕌</span>
+            <h4 class="category-card-title">ثقافة إسلامية</h4>
+            <p class="category-card-subtitle">القرآن، السيرة النبوية والغزوات والصحابة</p>
+          </div>
+
+          <div class="category-card" data-mode="GEOGRAPHY" role="button" tabindex="0">
+            <span class="category-card-icon">🌍</span>
+            <h4 class="category-card-title">جغرافيا وعواصم</h4>
+            <p class="category-card-subtitle">الدول والعواصم، التضاريس والمضائق والبحار</p>
+          </div>
+
+          <div class="category-card" data-mode="SCIENCE" role="button" tabindex="0">
+            <span class="category-card-icon">🔬</span>
+            <h4 class="category-card-title">علوم وطبيعة</h4>
+            <p class="category-card-subtitle">فيزياء، كيمياء، أحياء وظواهر طبيعية</p>
+          </div>
+
+          <div class="category-card" data-mode="ANATOMY" role="button" tabindex="0">
+            <span class="category-card-icon">🩺</span>
+            <h4 class="category-card-title">جسم الإنسان والطب</h4>
+            <p class="category-card-subtitle">الأعضاء، الهرمونات، العظام والحواس</p>
+          </div>
+
+          <div class="category-card" data-mode="ASTRONOMY" role="button" tabindex="0">
+            <span class="category-card-icon">🌌</span>
+            <h4 class="category-card-title">فلك وفضاء</h4>
+            <p class="category-card-subtitle">كواكب، نجوم، مجرات ورحلات الفضاء</p>
+          </div>
+
+          <div class="category-card" data-mode="TECHNOLOGY" role="button" tabindex="0">
+            <span class="category-card-icon">💻</span>
+            <h4 class="category-card-title">تكنولوجيا واختراعات</h4>
+            <p class="category-card-subtitle">حواسيب، برمجيات، إنترنت، ومخترعون كبار</p>
+          </div>
+
+          <div class="category-card" data-mode="ARABIC" role="button" tabindex="0">
+            <span class="category-card-icon">📖</span>
+            <h4 class="category-card-title">لغة عربية وأدب</h4>
+            <p class="category-card-subtitle">شعراء، معلقات، نحو وبلاغة وروايات</p>
+          </div>
+
+          <div class="category-card" data-mode="ANIMALS" role="button" tabindex="0">
+            <span class="category-card-icon">🦁</span>
+            <h4 class="category-card-title">عالم الحيوان والطيور</h4>
+            <p class="category-card-subtitle">أسرار الكائنات الحية والبيئة الفطرية</p>
+          </div>
+
+          <div class="category-card" data-mode="GENERAL" role="button" tabindex="0">
+            <span class="category-card-icon">🌐</span>
+            <h4 class="category-card-title">معلومات عامة وحقائق</h4>
+            <p class="category-card-subtitle">عجائب الدنيا، أرقام قياسية وثقافة عامة</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="modal-categories" type="button">إلغاء</button>
       </div>
     </div>
   </div>

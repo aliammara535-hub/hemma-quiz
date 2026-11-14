@@ -41,6 +41,7 @@
       this.state = GameStates.IDLE;
       this.isLocked = false;
       this.gameStartTime = null;
+      this.gameMode = 'ALL';
 
       // أسماء أرقام الأسئلة بالعربية
       this.arabicQuestionNumbers = [
@@ -60,8 +61,9 @@
     /**
      * بدء جلسة لعب جديدة
      * @param {Array} questionsPool بنك الأسئلة المتاح
+     * @param {string} modeId نمط اللعب أو التصنيف المختار (ALL أو SPORTS أو HISTORY...)
      */
-    async startNewGame(questionsPool = null) {
+    async startNewGame(questionsPool = null, modeId = 'ALL') {
       this.state = GameStates.LOADING;
       this.currentLevel = 1;
       this.currentQuestionIndex = 0;
@@ -70,9 +72,10 @@
       this.wrongAnswersCount = 0;
       this.isLocked = false;
       this.gameStartTime = Date.now();
+      this.gameMode = modeId || 'ALL';
 
-      // اختيار 10 أسئلة متدرجة الصعوبة وبدون أي تكرار
-      this.gameQuestions = window.QuestionsManager.selectGameQuestions(questionsPool);
+      // اختيار 10 أسئلة متدرجة الصعوبة بحسب التصنيف وبدون أي تكرار
+      this.gameQuestions = window.QuestionsManager.selectGameQuestions(questionsPool, this.gameMode);
 
       if (!this.gameQuestions || this.gameQuestions.length < this.totalLevels) {
         throw new Error('بنك الأسئلة غير كافٍ لبدء لعبة من 10 مستويات. يرجى التأكد من توفر 10 أسئلة على الأقل.');
@@ -93,6 +96,7 @@
 
       const q = this.gameQuestions[this.currentQuestionIndex];
       const levelNum = this.currentQuestionIndex + 1;
+      const modeInfo = window.QuestionsManager.getModeInfo(this.gameMode);
 
       return {
         questionId: q.id,
@@ -106,7 +110,9 @@
         difficulty: q.difficulty,
         difficultyLabel: window.QuestionsManager.getDifficultyLabel(q.difficulty),
         currentScore: this.score,
-        potentialReward: LEVEL_REWARDS[this.currentQuestionIndex]
+        potentialReward: LEVEL_REWARDS[this.currentQuestionIndex],
+        gameMode: this.gameMode,
+        modeInfo: modeInfo
       };
     }
 

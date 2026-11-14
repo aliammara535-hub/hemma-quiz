@@ -1,13 +1,13 @@
 /**
  * همة حتى القمة - Hemma Hatta AlQimma
- * وحدة بنك الأسئلة الشامل والمدقق لغوياً ومعرفياً
- * جميع الأسئلة بصياغة عربية فصيحة ومباشرة مع 4 خيارات واقعية ومميزة.
+ * وحدة بنك الأسئلة الشاملة والمدققة لغوياً ومعرفياً
+ * تدعم اللعبة الشاملة وكذلك نمط اختيار التصنيف المخصص (Category Selection)
  */
 
 (function (window) {
   'use strict';
 
-  // 1. التصنيفات العشرون المعتمدة
+  // 1. التصنيفات المعتمدة
   const CATEGORIES = {
     GENERAL: 'معلومات عامة',
     HISTORY: 'تاريخ',
@@ -31,7 +31,107 @@
     WORLD_FACTS: 'حقائق حول العالم'
   };
 
-  // 2. مستويات الصعوبة
+  // 2. أنماط اللعب والتصنيفات القابلة للاختيار
+  const GAME_MODES = {
+    ALL: {
+      id: 'ALL',
+      name: 'اللعبة الشاملة',
+      subtitle: 'كافة المجالات والتصنيفات مختلطة',
+      icon: '🌟',
+      badgeColor: '#D4AF37',
+      categories: null
+    },
+    SPORTS: {
+      id: 'SPORTS',
+      name: 'رياضة وكرة قدم',
+      subtitle: 'كؤوس العالم، الأندية والرياضات العالمية',
+      icon: '⚽',
+      badgeColor: '#2ECC71',
+      categories: [CATEGORIES.SPORTS, CATEGORIES.FOOTBALL]
+    },
+    HISTORY: {
+      id: 'HISTORY',
+      name: 'تاريخ وحضارات',
+      subtitle: 'الحضارات القديمة، المعارك والأحداث الكبرى',
+      icon: '📜',
+      badgeColor: '#E67E22',
+      categories: [CATEGORIES.HISTORY]
+    },
+    ISLAMIC: {
+      id: 'ISLAMIC',
+      name: 'ثقافة إسلامية',
+      subtitle: 'القرآن، السيرة النبوية والغزوات والصحابة',
+      icon: '🕌',
+      badgeColor: '#1ABC9C',
+      categories: [CATEGORIES.ISLAMIC]
+    },
+    GEOGRAPHY: {
+      id: 'GEOGRAPHY',
+      name: 'جغرافيا وعواصم',
+      subtitle: 'الدول والعواصم، التضاريس والمضائق والبحار',
+      icon: '🌍',
+      badgeColor: '#3498DB',
+      categories: [CATEGORIES.GEOGRAPHY, CATEGORIES.CAPITALS]
+    },
+    SCIENCE: {
+      id: 'SCIENCE',
+      name: 'علوم وطبيعة',
+      subtitle: 'فيزياء، كيمياء، أحياء وظواهر طبيعية',
+      icon: '🔬',
+      badgeColor: '#9B59B6',
+      categories: [CATEGORIES.SCIENCE, CATEGORIES.NATURE]
+    },
+    ANATOMY: {
+      id: 'ANATOMY',
+      name: 'جسم الإنسان والطب',
+      subtitle: 'الأعضاء، الهرمونات، العظام والحواس',
+      icon: '🩺',
+      badgeColor: '#E74C3C',
+      categories: [CATEGORIES.ANATOMY]
+    },
+    ASTRONOMY: {
+      id: 'ASTRONOMY',
+      name: 'فلك وفضاء',
+      subtitle: 'كواكب، نجوم، مجرات ورحلات الفضاء',
+      icon: '🌌',
+      badgeColor: '#5D6D7E',
+      categories: [CATEGORIES.ASTRONOMY]
+    },
+    TECHNOLOGY: {
+      id: 'TECHNOLOGY',
+      name: 'تكنولوجيا واختراعات',
+      subtitle: 'حواسيب، إنترنت، ومخترعون كبار',
+      icon: '💻',
+      badgeColor: '#34495E',
+      categories: [CATEGORIES.TECHNOLOGY, CATEGORIES.INVENTIONS]
+    },
+    ARABIC: {
+      id: 'ARABIC',
+      name: 'لغة عربية وأدب',
+      subtitle: 'شعراء، معلقات، نحو وبلاغة وروايات',
+      icon: '📖',
+      badgeColor: '#F39C12',
+      categories: [CATEGORIES.ARABIC, CATEGORIES.LITERATURE]
+    },
+    ANIMALS: {
+      id: 'ANIMALS',
+      name: 'عالم الحيوان والطيور',
+      subtitle: 'أسرار الكائنات الحية والبيئة الفطرية',
+      icon: '🦁',
+      badgeColor: '#27AE60',
+      categories: [CATEGORIES.ANIMALS]
+    },
+    GENERAL: {
+      id: 'GENERAL',
+      name: 'معلومات عامة وحقائق',
+      subtitle: 'عجائب الدنيا، أرقام قياسية وثقافة عامة',
+      icon: '🌐',
+      badgeColor: '#F1C40F',
+      categories: [CATEGORIES.GENERAL, CATEGORIES.WORLD_FACTS, CATEGORIES.ART, CATEGORIES.MATH, CATEGORIES.PERSONALITIES]
+    }
+  };
+
+  // 3. مستويات الصعوبة
   const DIFFICULTIES = {
     EASY: 'easy',          // المستويات 1–3
     MEDIUM: 'medium',      // المستويات 4–6
@@ -40,9 +140,7 @@
   };
 
   /**
-   * بنك الأسئلة المرجعي الكامل والمراجع لغوياً وعلمياً
-   * ملاحظة: الخيار الأول في المصفوفة [0] هو الإجابة الصحيحة دائماً،
-   * ويتم خلط الخيارات عشوائياً برمجياً عند بدء كل لعبة.
+   * بنك الأسئلة الشامل (250+ سؤالاً أصيلاً وموثقاً)
    */
   const MASTER_QUESTION_BANK = [
     // ==========================================
@@ -412,6 +510,46 @@
       category: CATEGORIES.HISTORY,
       difficulty: DIFFICULTIES.VERY_HARD
     },
+    {
+      id: "q_his_021",
+      question: "ما هي المعاهدة الدولية التي أنهت الحرب العالمية الأولى رسمياً عام 1919م؟",
+      answers: ["معاهدة فرساي", "معاهدة جنيف", "معاهدة لوزان", "معاهدة باريس"],
+      correctAnswer: 0,
+      category: CATEGORIES.HISTORY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_his_022",
+      question: "في أي عام وقعت الثورة الروسية البلشفية بقيادة فلاديمير لينين؟",
+      answers: ["1917م", "1905م", "1923م", "1914م"],
+      correctAnswer: 0,
+      category: CATEGORIES.HISTORY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_his_023",
+      question: "ما هي المدينة التي كانت عاصمة الإمبراطورية البيزنطية قبل الفتح العثماني؟",
+      answers: ["القسطنطينية", "روما", "أثينا", "أنطاكية"],
+      correctAnswer: 0,
+      category: CATEGORIES.HISTORY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_his_024",
+      question: "من هو الزعيم الهندي الذي قاد المقاومة السلمية واللاعنف لنيل استقلال الهند؟",
+      answers: ["المهاتما غاندي", "جواهر لال نهرو", "أنديرا غاندي", "كمال أتاتورك"],
+      correctAnswer: 0,
+      category: CATEGORIES.HISTORY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_his_025",
+      question: "ما هي الدولة التي قادت حملات الاستكشاف البحري حول رأس الرجاء الصالح بقيادة فاسكو دا غاما؟",
+      answers: ["البرتغال", "إسبانيا", "هولندا", "بريطانيا"],
+      correctAnswer: 0,
+      category: CATEGORIES.HISTORY,
+      difficulty: DIFFICULTIES.HARD
+    },
 
     // ==========================================
     // 3. دول وعواصم
@@ -718,11 +856,19 @@
     },
     {
       id: "q_geo_015",
-      question: "ما هي الدولة التي تمتلك أكبر عدد من الجزر الطبيعية في العالم؟",
-      answers: ["السويد", "النرويج", "إندونيسيا", "الفلبين"],
+      question: "ما هو المضيق المائي الذي يفصل قارة آسيا عن قارة أمريكا الشمالية؟",
+      answers: ["مضيق بيرنغ", "مضيق دوفر", "مضيق البوسفور", "مضيق ماجلان"],
       correctAnswer: 0,
-      category: CATEGORIES.WORLD_FACTS,
-      difficulty: DIFFICULTIES.VERY_HARD
+      category: CATEGORIES.GEOGRAPHY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_geo_016",
+      question: "ما هي أكبر دولة غير ساحلية (حبيسة) في العالم من حيث المساحة؟",
+      answers: ["كازاخستان", "منغوليا", "تشاد", "بوليفيا"],
+      correctAnswer: 0,
+      category: CATEGORIES.GEOGRAPHY,
+      difficulty: DIFFICULTIES.HARD
     },
 
     // ==========================================
@@ -848,9 +994,33 @@
       category: CATEGORIES.SCIENCE,
       difficulty: DIFFICULTIES.VERY_HARD
     },
+    {
+      id: "q_sci_016",
+      question: "ما هو المقياس العلمي المعتمد لقياس شدة وقوة الزلازل الأرضية؟",
+      answers: ["مقياس ريختر", "مقياس كلفن", "مقياس بوفورت", "مقياس موس"],
+      correctAnswer: 0,
+      category: CATEGORIES.SCIENCE,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_sci_017",
+      question: "ما هي درجة غليان الماء النقي بالدرجات المئوية عند مستوى سطح البحر؟",
+      answers: ["100 درجة مئوية", "90 درجة مئوية", "120 درجة مئوية", "80 درجة مئوية"],
+      correctAnswer: 0,
+      category: CATEGORIES.SCIENCE,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_sci_018",
+      question: "ما هو العنصر الأكثر وفرة في القشرة الأرضية؟",
+      answers: ["الأكسجين", "السيليكون", "الألمنيوم", "الحديد"],
+      correctAnswer: 0,
+      category: CATEGORIES.SCIENCE,
+      difficulty: DIFFICULTIES.HARD
+    },
 
     // ==========================================
-    // 6. جسم الإنسان وطب وصحة
+    // 6. جسم الإنسان والطب
     // ==========================================
     {
       id: "q_ana_001",
@@ -886,6 +1056,14 @@
     },
     {
       id: "q_ana_005",
+      question: "ما هو الغاز الذي تحمله خلايا الدم الحمراء من الرئتين إلى أنسجة الجسم كافة؟",
+      answers: ["الأكسجين", "النيتروجين", "ثاني أكسيد الكربون", "الهيليوم"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ana_006",
       question: "ما هو أكبر عضو باطني داخل جسم الإنسان؟",
       answers: ["الكبد", "الرئة", "الأمعاء الدقيقة", "المعدة"],
       correctAnswer: 0,
@@ -893,7 +1071,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ana_006",
+      id: "q_ana_007",
       question: "ما هي أصغر عظمة في جسم الإنسان؟",
       answers: ["عظمة الركاب في الأذن الوسطى", "عظمة السندان", "عظمة المطرقة", "فقرة العصعص"],
       correctAnswer: 0,
@@ -901,7 +1079,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ana_007",
+      id: "q_ana_008",
       question: "من هو الطبيب العربي المسلم الذي اكتشف الدورة الدموية الصغرى في التاريخ الطبي؟",
       answers: ["ابن النفيس", "ويليام هارفي", "ابن سينا", "أبو بكر الرازي"],
       correctAnswer: 0,
@@ -909,7 +1087,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ana_008",
+      id: "q_ana_009",
       question: "ما هي فصيلة الدم التي تسمى (المعطي العام) لجميع فصائل الدم الأخرى؟",
       answers: ["فصيلة O سالب", "فصيلة AB موجب", "فصيلة A موجب", "فصيلة B سالب"],
       correctAnswer: 0,
@@ -917,7 +1095,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ana_009",
+      id: "q_ana_010",
       question: "ما هي المادة الصبغية المسؤولة عن إعطاء الجلد والشعر والعينين لونها الطبيعي؟",
       answers: ["الميلانين", "الكيراتين", "الكولاجين", "الهيموغلوبين"],
       correctAnswer: 0,
@@ -925,7 +1103,23 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ana_010",
+      id: "q_ana_011",
+      question: "كم عدد صمامات قلب الإنسان الطبيعي؟",
+      answers: ["4 صمامات", "صمامان", "3 صمامات", "5 صمامات"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ana_012",
+      question: "ما هو الحمض الذي تفرزه المعدة للمساعدة في هضم البروتينات وقتل الميكروبات؟",
+      answers: ["حمض الهيدروكلوريك (HCl)", "حمض الكبريتيك", "حمض الستريك", "حمض الخليك"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ana_013",
       question: "ما هو الشريان الأكبر والأهم في جسم الإنسان الذي يضخ الدم المؤكسج من القلب؟",
       answers: ["الشريان الأبهر (الأورطي)", "الشريان الرئوي", "الشريان السباتي", "الشريان التاجي"],
       correctAnswer: 0,
@@ -933,7 +1127,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ana_011",
+      id: "q_ana_014",
       question: "ما هو العضو الذي يلقب بـ (مقبرة خلايا الدم الحمراء) الهرمة في جسم الإنسان؟",
       answers: ["الطحال", "الكبد", "نخاع العظم", "الكلى"],
       correctAnswer: 0,
@@ -941,16 +1135,40 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ana_012",
+      id: "q_ana_015",
+      question: "ما هي الغدة الصماء الموجودة في قاعدة الدماغ وتلقب بـ (سيدة الغدد)؟",
+      answers: ["الغدة النخامية", "الغدة الدرقية", "الغدة الكظرية", "الغدة الصنوبرية"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ana_016",
+      question: "ما هو أكبر عصب في جسم الإنسان ويمتد من أسفل الظهر إلى باطن القدم؟",
+      answers: ["عرق النسا (العصب الوركي)", "العصب الحائر", "العصب البصري", "العصب الفخذي"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ana_017",
       question: "ما هو علم دراسة الأنسجة الحية تحت المجهر؟",
       answers: ["الهستولوجيا (Histology)", "السيتولوجيا", "المورفولوجيا", "الفيسيولوجيا"],
       correctAnswer: 0,
-      category: CATEGORIES.SCIENCE,
+      category: CATEGORIES.ANATOMY,
+      difficulty: DIFFICULTIES.VERY_HARD
+    },
+    {
+      id: "q_ana_018",
+      question: "ما هو السائل الشفاف الذي يغسل الدماغ والنخاع الشوكي ويحميهما من الصدمات؟",
+      answers: ["السائل الدماغي الشوكي (CSF)", "السائل اللمفاوي", "بلازما الدم", "السائل الزلالي"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANATOMY,
       difficulty: DIFFICULTIES.VERY_HARD
     },
 
     // ==========================================
-    // 7. عالم الحيوان والطيور والطبيعة
+    // 7. عالم الحيوان والطيور
     // ==========================================
     {
       id: "q_ani_001",
@@ -1018,6 +1236,30 @@
     },
     {
       id: "q_ani_009",
+      question: "ما هو الطائر الذي يمتلك القدرة على تدوير رأسه حتى 270 درجة؟",
+      answers: ["البومة", "النسر", "الغراب", "الهدهد"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ani_010",
+      question: "ما هو أكبر حيوان مفترس من فصيلة السنوريات (القطط الكبيرة) في العالم؟",
+      answers: ["النمر السيبيري", "الأسد الإفريقي", "الفهد", "اليغور"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ani_011",
+      question: "كم عدد أذرع نجم البحر الشائع في معظم البحار؟",
+      answers: ["5 أذرع", "6 أذرع", "8 أذرع", "4 أذرع"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ani_012",
       question: "كم عدد فقرات عنق الزرافة بالرغم من طول رقبتها الفارع؟",
       answers: ["7 فقرات (مثل الإنسان)", "14 فقرة", "21 فقرة", "10 فقرات"],
       correctAnswer: 0,
@@ -1025,7 +1267,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ani_010",
+      id: "q_ani_013",
       question: "ما هو الحيوان الذي يستطيع النوم وإحدى نصفي دماغه وعينيه مستيقظة؟",
       answers: ["الدلفين", "الذئب", "الكنغر", "الشمبانزي"],
       correctAnswer: 0,
@@ -1033,9 +1275,33 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ani_011",
+      id: "q_ani_014",
+      question: "ما هو الكائن البحري الفريد الذي يقوم الذكر فيه بالحمل ورعاية البيض حتى يفقس؟",
+      answers: ["حصان البحر (فرس البحر)", "سمك المهرج", "الأخطبوط", "قنديل البحر"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ani_015",
+      question: "ما هي أسرع سمكة في المحيطات حيث تتجاوز سرعتها 100 كم/ساعة؟",
+      answers: ["سمكة الشراع (المرلين)", "القرش الأبيض", "التونة العنيدة", "الباراكودا"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ani_016",
       question: "ما هو الحيوان الثديي الفريد الذي يضع البيض بدلاً من الولادة الحية؟",
       answers: ["خلد الماء (منقار البط)", "القنفذ", "آكل النمل الحرشفي", "الأبوسوم"],
+      correctAnswer: 0,
+      category: CATEGORIES.ANIMALS,
+      difficulty: DIFFICULTIES.VERY_HARD
+    },
+    {
+      id: "q_ani_017",
+      question: "ما هي الحشرة الوحيدة التي يمكنها العيش عدة أسابيع دون رأس لأنها تتنفس عبر ثقوب بجسمها؟",
+      answers: ["الصرصور", "الجندب", "الخنفساء", "النملة"],
       correctAnswer: 0,
       category: CATEGORIES.ANIMALS,
       difficulty: DIFFICULTIES.VERY_HARD
@@ -1086,6 +1352,14 @@
     },
     {
       id: "q_ast_006",
+      question: "كم يوماً تقريباً تستغرق الأرض لتكمل دورة كاملة واحدة حول الشمس؟",
+      answers: ["365 يوماً وربع اليوم", "360 يوماً", "300 يوم", "350 يوماً"],
+      correctAnswer: 0,
+      category: CATEGORIES.ASTRONOMY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ast_007",
       question: "ما هو الكوكب الأكثر سخونة في المجموعة الشمسية؟",
       answers: ["كوكب الزهرة", "عطارد", "المريخ", "المشتري"],
       correctAnswer: 0,
@@ -1093,7 +1367,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ast_007",
+      id: "q_ast_008",
       question: "كم دقيقة يستغرق ضوء الشمس تقريباً للوصول إلى كوكب الأرض؟",
       answers: ["8 دقائق و20 ثانية", "12 دقيقة", "5 دقائق و10 ثوانٍ", "15 دقيقة"],
       correctAnswer: 0,
@@ -1101,7 +1375,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ast_008",
+      id: "q_ast_009",
       question: "ما هو العنصر الكيميائي الأساسي المسؤول عن الاندماج النووي داخل الشمس؟",
       answers: ["الهيدروجين", "الهيليوم", "الأكسجين", "النيتروجين"],
       correctAnswer: 0,
@@ -1109,7 +1383,23 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ast_009",
+      id: "q_ast_010",
+      question: "ما هي الظاهرة الفلكية التي تحدث عند وقوع الأرض تماماً بين الشمس والقمر؟",
+      answers: ["خسوف القمر", "كسوف الشمس", "الشهب الساقطة", "الاقتران العظيم"],
+      correctAnswer: 0,
+      category: CATEGORIES.ASTRONOMY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ast_011",
+      question: "ما هي السحب الكونية الهائلة المكونة من الغاز والغبار وتعتبر مصانع ولادة النجوم؟",
+      answers: ["السديم (Nebula)", "الثقب الأسود", "المستعر", "الشهاب"],
+      correctAnswer: 0,
+      category: CATEGORIES.ASTRONOMY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ast_012",
       question: "ما هو أضخم قمر تابع لكوكب المشتري وأكبر قمر في النظام الشمسي؟",
       answers: ["غانيميد", "تيتان", "أوروبا", "كاليستو"],
       correctAnswer: 0,
@@ -1117,7 +1407,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ast_010",
+      id: "q_ast_013",
       question: "ما هو اسم أقرب نجم إلى الأرض بعد الشمس؟",
       answers: ["بروكسيما سنتوري (قنطور الأقرب)", "نجم الشعرى اليمانية", "نجم الجدي", "منكب الجوزاء"],
       correctAnswer: 0,
@@ -1125,7 +1415,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ast_011",
+      id: "q_ast_014",
       question: "ما هو الانفجار النجمي العظيم الذي يمثل نهاية حياة نجم عملاق؟",
       answers: ["المستعر الأعظم (Supernova)", "السديم الكوني", "الرياح الشمسية", "الثقب الأسود"],
       correctAnswer: 0,
@@ -1133,9 +1423,25 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ast_012",
+      id: "q_ast_015",
+      question: "ما هو المسبار البشري الأبعد عن الأرض والذي غادر حدود المجموعة الشمسية؟",
+      answers: ["فوياجر 1 (Voyager 1)", "نيو هورايزونز", "بيونير 10", "كاسيني"],
+      correctAnswer: 0,
+      category: CATEGORIES.ASTRONOMY,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ast_016",
       question: "ما هي أبعد نقطة في مدار الكوكب حول الشمس تسمى فلكياً؟",
       answers: ["نقطة الأوج", "نقطة الحضيض", "نقطة الاعتدال", "نقطة الانقلاب"],
+      correctAnswer: 0,
+      category: CATEGORIES.ASTRONOMY,
+      difficulty: DIFFICULTIES.VERY_HARD
+    },
+    {
+      id: "q_ast_017",
+      question: "ما هو النجم العملاق ذو اللون الأحمر في كوكبة الجبار وتوشك حياته على الانتهاء كمستعر أعظم؟",
+      answers: ["منكب الجوزاء (Betelgeuse)", "الدبران", "قلب العقرب", "النسر الواقع"],
       correctAnswer: 0,
       category: CATEGORIES.ASTRONOMY,
       difficulty: DIFFICULTIES.VERY_HARD
@@ -1178,6 +1484,22 @@
     },
     {
       id: "q_tec_005",
+      question: "ما هي الشركة التي طورت نظام التشغيل الشهير (Windows) للحواسيب؟",
+      answers: ["مايكروسوفت (Microsoft)", "أبل (Apple)", "جوجل (Google)", "آي بي إم (IBM)"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_tec_006",
+      question: "ما هو الاختصار التقني لنظام تحديد المواقع العالمي عبر الأقمار الصناعية؟",
+      answers: ["GPS", "GSM", "DNS", "VPN"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_tec_007",
       question: "ما هي لغة البرمجة التي ابتكرها خايدو فان روسم (Guido van Rossum) عام 1991؟",
       answers: ["بايثون (Python)", "جافا (Java)", "سي بلس بلس (C++)", "روبي (Ruby)"],
       correctAnswer: 0,
@@ -1185,7 +1507,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_tec_006",
+      id: "q_tec_008",
       question: "كم بايت يساوي الكيلوبايت الواحد (Kilobyte) بالنظام الثنائي الدقيق؟",
       answers: ["1024 بايت", "1000 بايت", "512 بايت", "2048 بايت"],
       correctAnswer: 0,
@@ -1193,7 +1515,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_tec_007",
+      id: "q_tec_009",
       question: "من هو العالم الاسكتلندي مكتشف البنسلين كأول مضاد حيوي في التاريخ الطبي؟",
       answers: ["ألكسندر فليمنغ", "لويس باستور", "روبرت كوخ", "إدوارد جينر"],
       correctAnswer: 0,
@@ -1201,7 +1523,31 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_tec_008",
+      id: "q_tec_010",
+      question: "ما هي العملة الرقمية المشفرة الأولى التي أُطلقت عام 2009 على يد ساتوشي ناكاموتو؟",
+      answers: ["البيتكوين (Bitcoin)", "الإيثيريوم", "الريبل", "الدوجكوين"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_tec_011",
+      question: "في أي عام أطلق ستيف جوبز أول هاتف آيفون (iPhone) في العالم؟",
+      answers: ["عام 2007م", "عام 2005م", "عام 2009م", "عام 2010م"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_tec_012",
+      question: "من هو مخترع المحرك البخاري المكثف الذي أطلق شرارة الثورة الصناعية؟",
+      answers: ["جيمس وات", "توماس نيوكومن", "جورج ستيفنسون", "هنري بيسمر"],
+      correctAnswer: 0,
+      category: CATEGORIES.INVENTIONS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_tec_013",
       question: "من هو العالم البريطاني الملقب بأبي علوم الحاسوب ومحلل شيفرة إنيغما؟",
       answers: ["آلان تورنغ (Alan Turing)", "تشارلز باباج", "جون فون نيومان", "تيم بيرنرز لي"],
       correctAnswer: 0,
@@ -1209,7 +1555,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_tec_009",
+      id: "q_tec_014",
       question: "من هو مخترع الشبكة العنكبوتية العالمية (World Wide Web) عام 1989؟",
       answers: ["تيم بيرنرز لي", "بيل غيتس", "ستيف جوبز", "مارك زوكربيرغ"],
       correctAnswer: 0,
@@ -1217,12 +1563,28 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_tec_010",
+      id: "q_tec_015",
       question: "من هو مخترع آلة الطباعة بالحروف المعدنية المتحركة في أوروبا؟",
       answers: ["يوهانس غوتنبرغ", "ليوناردو دافنشي", "إسحاق نيوتن", "غاليلو غاليلي"],
       correctAnswer: 0,
       category: CATEGORIES.INVENTIONS,
       difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_tec_016",
+      question: "ما هي أول لغة برمجة عالية المستوى طورتها شركة IBM في خمسينيات القرن العشرين؟",
+      answers: ["فورتران (Fortran)", "كوبول (COBOL)", "لغة السي (C)", "باسكال"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_tec_017",
+      question: "ما هي البوابة المنطقية التي تعكس قيمة الإشارة الثنائية (من 0 إلى 1 ومن 1 إلى 0)؟",
+      answers: ["بوابة النفي (NOT Gate)", "بوابة AND", "بوابة OR", "بوابة XOR"],
+      correctAnswer: 0,
+      category: CATEGORIES.TECHNOLOGY,
+      difficulty: DIFFICULTIES.VERY_HARD
     },
 
     // ==========================================
@@ -1262,6 +1624,22 @@
     },
     {
       id: "q_ara_005",
+      question: "من هو الشاعر العباسي العظيم صاحب البيت الشهير: (الخيل والليل والبيداء تعرفني)؟",
+      answers: ["أبو الطيب المتنبي", "أبو تمام", "البحتري", "أبو العلاء المعري"],
+      correctAnswer: 0,
+      category: CATEGORIES.LITERATURE,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ara_006",
+      question: "ما هو اسم صوت الماء الجاري العذب في المعاجم العربية؟",
+      answers: ["الخرير", "الحفيف", "الدوي", "النقيق"],
+      correctAnswer: 0,
+      category: CATEGORIES.ARABIC,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_ara_007",
       question: "من هو صاحب المعلقة الشهيرة: (قفا نبكِ من ذِكرى حبيبٍ ومنزلِ)؟",
       answers: ["امرؤ القيس", "عنترة بن شداد", "زهير بن أبي سلمى", "طرفة بن العبد"],
       correctAnswer: 0,
@@ -1269,7 +1647,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ara_006",
+      id: "q_ara_008",
       question: "من هو الفارس الجاهلي صاحب المعلقة التي مطلعها: (هل غادرَ الشعراءُ من متردَّمِ)؟",
       answers: ["عنترة بن شداد", "عمرو بن كلثوم", "الحارث بن حلزة", "النابغة الذبياني"],
       correctAnswer: 0,
@@ -1277,7 +1655,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ara_007",
+      id: "q_ara_009",
       question: "من هو واضع علم النحو العربي بأمر من أمير المؤمنين علي بن أبي طالب؟",
       answers: ["أبو الأسود الدؤلي", "سيبويه", "ابن جني", "الزمخشري"],
       correctAnswer: 0,
@@ -1285,7 +1663,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ara_008",
+      id: "q_ara_010",
       question: "ما هو المحسن البديعي القائم على تشابه كلمتين في اللفظ واختلافهما في المعنى؟",
       answers: ["الجناس", "السجع", "الطباق", "التورية"],
       correctAnswer: 0,
@@ -1293,7 +1671,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ara_009",
+      id: "q_ara_011",
       question: "من هو مؤلف ملحمتي الإلياذة والأوديسة الإغريقيتين؟",
       answers: ["هوميروس", "أفلاطون", "أرسطو", "سقراط"],
       correctAnswer: 0,
@@ -1301,7 +1679,15 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_ara_010",
+      id: "q_ara_012",
+      question: "من هو كاتب رواية (البؤساء) الخالدة في الأدب الفرنسي العالمي؟",
+      answers: ["فيكتور هوغو", "ألكسندر دوما", "غوستاف فلوبير", "إميل زولا"],
+      correctAnswer: 0,
+      category: CATEGORIES.LITERATURE,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_ara_013",
       question: "من هو الأديب العربي الحائز على جائزة نوبل في الأدب عام 1988م؟",
       answers: ["نجيب محفوظ", "طه حسين", "توفيق الحكيم", "عباس محمود العقاد"],
       correctAnswer: 0,
@@ -1309,7 +1695,7 @@
       difficulty: DIFFICULTIES.EASY
     },
     {
-      id: "q_ara_011",
+      id: "q_ara_014",
       question: "ما هو جمع كلمة (حليب) في المعاجم العربية المعتمدة؟",
       answers: ["أحلبة أو حُلبان", "أحلاء", "حليبات", "محالب"],
       correctAnswer: 0,
@@ -1317,7 +1703,23 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ara_012",
+      id: "q_ara_015",
+      question: "ما هو جمع كلمة (عندليب) في المعاجم العربية؟",
+      answers: ["عنادل", "عناديل", "عندليبات", "أعاندة"],
+      correctAnswer: 0,
+      category: CATEGORIES.ARABIC,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ara_016",
+      question: "من هو الشاعر والفيلسوف العباسي الملقب بـ (رهين المحبسين)؟",
+      answers: ["أبو العلاء المعري", "ابن الرومي", "ابن الفارض", "الشريف الرضي"],
+      correctAnswer: 0,
+      category: CATEGORIES.LITERATURE,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_ara_017",
       question: "من هو واضع علم العروض لضبط أوزان وبحور الشعر العربي؟",
       answers: ["الخليل بن أحمد الفراهيدي", "سيبويه", "أبو الأسود الدؤلي", "ابن جني"],
       correctAnswer: 0,
@@ -1325,7 +1727,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ara_013",
+      id: "q_ara_018",
       question: "ما هو المحسن البديعي القائم على توافق فواصل الجمل في الحرف الأخير نثراً؟",
       answers: ["السجع", "الجناس", "الطباق", "التورية"],
       correctAnswer: 0,
@@ -1333,7 +1735,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ara_014",
+      id: "q_ara_019",
       question: "ما هو المعجم اللغوي العربي الشهير الذي ألفه الفيروزآبادي؟",
       answers: ["القاموس المحيط", "لسان العرب", "تاج العروس", "معجم العين"],
       correctAnswer: 0,
@@ -1341,9 +1743,17 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_ara_015",
+      id: "q_ara_020",
       question: "كم عدد بحور الشعر العربي التي وضعها الخليل بن أحمد وتدارك عليها الأخفش؟",
       answers: ["16 بحراً", "14 بحراً", "18 بحراً", "12 بحراً"],
+      correctAnswer: 0,
+      category: CATEGORIES.LITERATURE,
+      difficulty: DIFFICULTIES.VERY_HARD
+    },
+    {
+      id: "q_ara_021",
+      question: "ما هو البحر الشعري الأكثر استخداماً وفخامة في الشعر العربي القديم ويسمى (أبو البحور)؟",
+      answers: ["بحر الطويل", "بحر البسيط", "بحر الكامل", "بحر الوافر"],
       correctAnswer: 0,
       category: CATEGORIES.LITERATURE,
       difficulty: DIFFICULTIES.VERY_HARD
@@ -1410,6 +1820,30 @@
     },
     {
       id: "q_spo_008",
+      question: "ما هي الدولة التي فازت ببطولة كأس العالم لكرة القدم 2022 في قطر؟",
+      answers: ["الأرجنتين", "فرنسا", "كرواتيا", "إنجلترا"],
+      correctAnswer: 0,
+      category: CATEGORIES.FOOTBALL,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_spo_009",
+      question: "كم حلقة ملونة توجد في الشعار الرسمي للألعاب الأولمبية؟",
+      answers: ["5 حلقات", "6 حلقات", "4 حلقات", "7 حلقات"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_spo_010",
+      question: "في أي رياضة يشتهر اسم اللاعب الأمريكي الأسطوري مايكل جوردان؟",
+      answers: ["كرة السلة", "كرة القدم الأمريكية", "البيسبول", "التنس"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_spo_011",
       question: "ما هي الدولة الفائزة بأول بطولة كأس عالم لكرة القدم عام 1930؟",
       answers: ["الأوروغواي", "الأرجنتين", "البرازيل", "إيطاليا"],
       correctAnswer: 0,
@@ -1417,7 +1851,7 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_spo_009",
+      id: "q_spo_012",
       question: "من هو اللاعب الأكثر تتويجاً بجائزة الكرة الذهبية (Ballon d'Or) عبر التاريخ؟",
       answers: ["ليونيل ميسي", "كريستيانو رونالدو", "ميشيل بلاتيني", "يوهان كرويف"],
       correctAnswer: 0,
@@ -1425,7 +1859,39 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_spo_010",
+      id: "q_spo_013",
+      question: "كم يبلغ عدد لاعبي فريق كرة اليد الأساسيين داخل الملعب لكل فريق؟",
+      answers: ["7 لاعبين", "6 لاعبين", "8 لاعبين", "5 لاعبين"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_spo_014",
+      question: "كم يبلغ عدد لاعبي فريق الكرة الطائرة الأساسيين داخل أرضية الملعب؟",
+      answers: ["6 لاعبين", "5 لاعبين", "7 لاعبين", "8 لاعبين"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_spo_015",
+      question: "ما هي الدولة الأكثر تتويجاً بكأس أمم إفريقيا لكرة القدم برصيد 7 ألقاب؟",
+      answers: ["مصر", "الكاميرون", "غانا", "نيجيريا"],
+      correctAnswer: 0,
+      category: CATEGORIES.FOOTBALL,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_spo_016",
+      question: "من هو العداء الجامايكي الأسطوري صاحب الرقم القياسي العالمي في سباق 100 متر (9.58 ثانية)؟",
+      answers: ["يوسين بولت", "تايسون غاي", "أسافا باول", "يوهان بليك"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_spo_017",
       question: "من هو الهداف التاريخي لبطولات كأس العالم لكرة القدم برصيد 16 هدفاً؟",
       answers: ["ميروسلاف كلوزه", "الظاهرة رونالدو", "بيليه", "غيرد مولر"],
       correctAnswer: 0,
@@ -1433,7 +1899,7 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_spo_011",
+      id: "q_spo_018",
       question: "كم يبلغ طول سباق الماراثون الرسمي بالكيلومترات؟",
       answers: ["42.195 كيلومتراً", "40 كيلومتراً", "45.5 كيلومتراً", "38.2 كيلومتراً"],
       correctAnswer: 0,
@@ -1441,12 +1907,36 @@
       difficulty: DIFFICULTIES.HARD
     },
     {
-      id: "q_spo_012",
+      id: "q_spo_019",
       question: "في أي عام انطلقت أول دورة ألعاب أولمبية في العصر الحديث بأثينا؟",
       answers: ["عام 1896م", "عام 1900م", "عام 1888م", "عام 1904م"],
       correctAnswer: 0,
       category: CATEGORIES.SPORTS,
       difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_spo_020",
+      question: "ما هي بطولة التنس الكبرى الوحيدة التي تقام مبارياتها على الملاعب العشبية الخضراء؟",
+      answers: ["بطولة ويمبلدون", "بطولة رولان غاروس", "بطولة أمريكا المفتوحة", "بطولة أستراليا المفتوحة"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_spo_021",
+      question: "من هو السباح الأولمبي التاريخي الأكثر حصداً للميداليات الذهبية في تاريخ الأولمبياد؟",
+      answers: ["مايكل فيلبس", "مارك سبيتز", "إيان ثورب", "رايان لوكتي"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_spo_022",
+      question: "كم يبلغ الارتفاع القانوني لسلة كرة السلة عن أرضية الملعب بالأقدام؟",
+      answers: ["10 أقدام (حوالي 3.05 أمتار)", "9 أقدام", "11 قدماً", "12 قدماً"],
+      correctAnswer: 0,
+      category: CATEGORIES.SPORTS,
+      difficulty: DIFFICULTIES.VERY_HARD
     },
 
     // ==========================================
@@ -1526,14 +2016,6 @@
     },
     {
       id: "q_gen_010",
-      question: "ما هو العدد الأولي الوحيد الذي يكون عدداً زوجياً؟",
-      answers: ["العدد 2", "العدد 4", "العدد 0", "العدد 1"],
-      correctAnswer: 0,
-      category: CATEGORIES.MATH,
-      difficulty: DIFFICULTIES.MEDIUM
-    },
-    {
-      id: "q_gen_011",
       question: "من هو الرسام العالمي صاحب اللوحة الشهيرة (الموناليزا) المعروضة في متحف اللوفر؟",
       answers: ["ليوناردو دافنشي", "مايكل أنجلو", "فنسنت فان غوخ", "بابلو بيكاسو"],
       correctAnswer: 0,
@@ -1541,7 +2023,7 @@
       difficulty: DIFFICULTIES.EASY
     },
     {
-      id: "q_gen_012",
+      id: "q_gen_011",
       question: "ما هو أعلى برج وناطحة سحاب في العالم شيد حتى الآن؟",
       answers: ["برج خليفة في دبي", "برج شنغهاي", "أبراج البيت بمكة", "برج تايبيه 101"],
       correctAnswer: 0,
@@ -1549,7 +2031,7 @@
       difficulty: DIFFICULTIES.EASY
     },
     {
-      id: "q_gen_013",
+      id: "q_gen_012",
       question: "ما هي القناة البحرية الصناعية التي تربط بين البحر الأبيض المتوسط والبحر الأحمر؟",
       answers: ["قناة السويس", "قناة بنما", "قناة كيل", "قناة كورنث"],
       correctAnswer: 0,
@@ -1557,7 +2039,39 @@
       difficulty: DIFFICULTIES.EASY
     },
     {
+      id: "q_gen_013",
+      question: "في أي دولة يقع قصر الحمراء الشهير ذو الطراز الأندلسي البديع؟",
+      answers: ["إسبانيا (مدينة غرناطة)", "المغرب", "البرتغال", "إيطاليا"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
       id: "q_gen_014",
+      question: "ما هي المدينة الإيطالية العائمة الشهيرة بقنواتها المائية وقوارب الجندول؟",
+      answers: ["البندقية (فينيسيا)", "فلورنسا", "ميلانو", "نابولي"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_gen_015",
+      question: "كم عدد النجوم الموجودة على العلم الوطني للولايات المتحدة الأمريكية؟",
+      answers: ["50 نجمة", "48 نجمة", "52 نجمة", "51 نجمة"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.EASY
+    },
+    {
+      id: "q_gen_016",
+      question: "ما هو العدد الأولي الوحيد الذي يكون عدداً زوجياً؟",
+      answers: ["العدد 2", "العدد 4", "العدد 0", "العدد 1"],
+      correctAnswer: 0,
+      category: CATEGORIES.MATH,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_gen_017",
       question: "ما هي القناة المائية التي تختصر مسافة العبور بين المحيط الأطلسي والمحيط الهادئ في أمريكا الوسطى؟",
       answers: ["قناة بنما", "قناة السويس", "مضيق ماجلان", "قناة إيري"],
       correctAnswer: 0,
@@ -1565,7 +2079,31 @@
       difficulty: DIFFICULTIES.MEDIUM
     },
     {
-      id: "q_gen_015",
+      id: "q_gen_018",
+      question: "ما هو الحجر الكريم الأزرق النادر والأغلى بين الأحجار الكريمة؟",
+      answers: ["الياقوت الأزرق (الزفير)", "التوباز", "الفيروز", "اللازورد"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_gen_019",
+      question: "ما هي عاصمة إثيوبيا ومقر الاتحاد الإفريقي؟",
+      answers: ["أديس أبابا", "نيروبي", "أسمرة", "جيبوتي"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.MEDIUM
+    },
+    {
+      id: "q_gen_020",
+      question: "ما هي الدولة الأولى في العالم التي منحت المرأة حق التصويت والانتخاب عام 1893م؟",
+      answers: ["نيوزيلندا", "فنلندا", "بريطانيا", "السويد"],
+      correctAnswer: 0,
+      category: CATEGORIES.WORLD_FACTS,
+      difficulty: DIFFICULTIES.HARD
+    },
+    {
+      id: "q_gen_021",
       question: "ما هي مبرهنة فيرما الأخيرة التي استعصت على الإثبات لأكثر من 350 عاماً حتى أثبتها أندرو وايلز؟",
       answers: [
         "المعادلة an + bn = cn ليس لها حلول صحيحة موجبة إذا كانت n > 2",
@@ -1583,6 +2121,8 @@
    * وحدة إدارة واختيار الأسئلة للعبة همة حتى القمة
    */
   const QuestionsManager = {
+    GAME_MODES: GAME_MODES,
+
     /**
      * الحصول على بنك الأسئلة المرجعي الكامل
      * @returns {Array}
@@ -1597,6 +2137,23 @@
      */
     getBankCount() {
       return MASTER_QUESTION_BANK.length;
+    },
+
+    /**
+     * الحصول على قائمة أنماط اللعب المتاحة
+     * @returns {Array}
+     */
+    getAvailableModes() {
+      return Object.values(GAME_MODES);
+    },
+
+    /**
+     * الحصول على معلومات نمط معين
+     * @param {string} modeId 
+     * @returns {Object}
+     */
+    getModeInfo(modeId = 'ALL') {
+      return GAME_MODES[modeId] || GAME_MODES.ALL;
     },
 
     /**
@@ -1647,6 +2204,8 @@
 
     /**
      * اختيار 10 أسئلة متدرجة الصعوبة لجلسة لعب واحدة
+     * يدعم تصفية الأسئلة بحسب التصنيف المختار (modeId)
+     * 
      * التوزيع المعتمد:
      * - المستويات 1–3: سهل (easy)
      * - المستويات 4–6: متوسط (medium)
@@ -1654,31 +2213,50 @@
      * - المستويات 9–10: قمة التحدي (very_hard)
      * 
      * @param {Array} sourceQuestions مصدر الأسئلة (قادمة من Firebase أو البنك المرجعي)
+     * @param {string} modeId مفتاح التصنيف (ALL, SPORTS, HISTORY, ...)
      * @returns {Array} 10 أسئلة مجهزة ومرتبة تصاعدياً
      */
-    selectGameQuestions(sourceQuestions = null) {
-      const pool = (Array.isArray(sourceQuestions) && sourceQuestions.length >= 10) 
+    selectGameQuestions(sourceQuestions = null, modeId = 'ALL') {
+      const basePool = (Array.isArray(sourceQuestions) && sourceQuestions.length >= 10) 
         ? sourceQuestions 
         : MASTER_QUESTION_BANK;
 
+      // تصفية البنك بحسب التصنيف المختار
+      let filteredPool = basePool;
+      const selectedMode = GAME_MODES[modeId] || GAME_MODES.ALL;
+
+      if (selectedMode.id !== 'ALL' && Array.isArray(selectedMode.categories) && selectedMode.categories.length > 0) {
+        const matchingQuestions = basePool.filter(q => selectedMode.categories.includes(q.category));
+        // إذا كان هناك ما لا يقل عن 10 أسئلة في التصنيف، نلزم اللعبة بالكامل بالتصنيف
+        if (matchingQuestions.length >= 10) {
+          filteredPool = matchingQuestions;
+        } else {
+          // إذا لم تتوفر في المصدر الخارجي، نأخذها من البنك المرجعي المضمون
+          const fallbackMatches = MASTER_QUESTION_BANK.filter(q => selectedMode.categories.includes(q.category));
+          if (fallbackMatches.length >= 10) {
+            filteredPool = fallbackMatches;
+          }
+        }
+      }
+
       // تصنيف الأسئلة حسب الصعوبة
-      const easyPool = pool.filter(q => q.difficulty === DIFFICULTIES.EASY);
-      const mediumPool = pool.filter(q => q.difficulty === DIFFICULTIES.MEDIUM);
-      const hardPool = pool.filter(q => q.difficulty === DIFFICULTIES.HARD);
-      const veryHardPool = pool.filter(q => q.difficulty === DIFFICULTIES.VERY_HARD);
+      const easyPool = filteredPool.filter(q => q.difficulty === DIFFICULTIES.EASY);
+      const mediumPool = filteredPool.filter(q => q.difficulty === DIFFICULTIES.MEDIUM);
+      const hardPool = filteredPool.filter(q => q.difficulty === DIFFICULTIES.HARD);
+      const veryHardPool = filteredPool.filter(q => q.difficulty === DIFFICULTIES.VERY_HARD);
 
       // دالة مساعدة لاختيار N أسئلة عشوائية بدون تكرار مع fallback آمن
       const pickRandom = (arr, count, fallbackArr) => {
-        const available = arr.length >= count ? arr : (fallbackArr.length >= count ? fallbackArr : pool);
+        const available = arr.length >= count ? arr : (fallbackArr.length >= count ? fallbackArr : filteredPool);
         const shuffled = this.shuffleArray(available);
         return shuffled.slice(0, count);
       };
 
       // اختيار الأسئلة بحسب المستويات
-      const selectedEasy = pickRandom(easyPool, 3, pool);
-      const selectedMedium = pickRandom(mediumPool, 3, pool);
-      const selectedHard = pickRandom(hardPool, 2, pool);
-      const selectedVeryHard = pickRandom(veryHardPool, 2, pool);
+      const selectedEasy = pickRandom(easyPool, 3, filteredPool);
+      const selectedMedium = pickRandom(mediumPool, 3, filteredPool);
+      const selectedHard = pickRandom(hardPool, 2, filteredPool);
+      const selectedVeryHard = pickRandom(veryHardPool, 2, filteredPool);
 
       // تجميع الأسئلة الـ 10
       const combined = [
@@ -1699,15 +2277,22 @@
         }
       }
 
-      // إذا حدث نقص نادر بسبب تكرار في التجميع، نكمل من البنك
+      // إذا حدث نقص نادر بسبب تكرار في التجميع، نكمل من البنك المصفى
       if (uniqueGameQuestions.length < 10) {
-        const remaining = pool.filter(q => !seenIds.has(q.id));
+        const remaining = filteredPool.filter(q => !seenIds.has(q.id));
         const extra = this.shuffleArray(remaining).slice(0, 10 - uniqueGameQuestions.length);
         uniqueGameQuestions.push(...extra);
       }
 
+      // في حال ندرة أسئلة تصنيف معين
+      if (uniqueGameQuestions.length < 10) {
+        const remainingAll = basePool.filter(q => !seenIds.has(q.id));
+        const extraAll = this.shuffleArray(remainingAll).slice(0, 10 - uniqueGameQuestions.length);
+        uniqueGameQuestions.push(...extraAll);
+      }
+
       // خلط الإجابات لكل سؤال من الأسئلة العشرة المختارة
-      return uniqueGameQuestions.map(q => this.prepareQuestionWithShuffledAnswers(q));
+      return uniqueGameQuestions.slice(0, 10).map(q => this.prepareQuestionWithShuffledAnswers(q));
     },
 
     /**
@@ -1739,6 +2324,7 @@
   };
 
   window.CATEGORIES = CATEGORIES;
+  window.GAME_MODES = GAME_MODES;
   window.DIFFICULTIES = DIFFICULTIES;
   window.QuestionsManager = QuestionsManager;
 })(window);
